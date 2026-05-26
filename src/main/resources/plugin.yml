@@ -1,0 +1,45 @@
+name: ShootEXP
+main: moe.feo.shootexp.ShootEXP
+version: 1.2.2
+author: Fengshuai(R_Josef)
+api-version: 1.16
+folia-supported: true
+softdepend:
+  - SkillAPI
+  - MMOCore
+  - Brewery
+commands:
+  shootexp:
+    description: 'Main command of ShootEXP'
+    usage: '/<command>'
+permissions:
+  shootexp.*:
+    description: 'All permissions.'
+    default: op
+    children:
+      shootexp.status: true
+      shootexp.item: true
+      shootexp.restore: true
+      shootexp.set: true
+      shootexp.reload: true
+  shootexp.status:
+    description: 'Check player status.'
+    default: true
+  shootexp.item:
+    description: 'Get exp item.'
+    default: op
+  shootexp.restore:
+    description: 'Restore status for player.'
+    default: op
+  shootexp.set:
+    description: 'Set status for player'
+    default: op
+  shootexp.reload:
+    description: 'Reload plugin.'
+    default: op
+  shootexp.toggle:
+    description: 'Toggle ShootEXP settings'
+    default: true
+  shootexp.gui:
+    description: 'Open ShootEXP GUI'
+    default: true
