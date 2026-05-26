@@ -8,6 +8,7 @@
 | ------- | -------- | ------------- | --------------------- |
 | master  | 普通版本 | 1.14+         | [ShootEXP-1.1.jar](https://github.com/R-Josef/ShootEXP/releases/download/1.1/ShootEXP-1.1.jar) |
 | nms     | NMS版本  | 1.12.2 1.16.4 | [ShootEXP-1.1-nms.jar](https://github.com/R-Josef/ShootEXP/releases/download/1.1-nms/ShootEXP-1.1-nms.jar) |
+| folia   | Folia版本| 1.21+         | [ShootEXP-1.2.2.jar](https://github.com/qumingjam/ShootEXP-folia/releases/download/v1.2.2/ShootEXP-1.2.2.jar) |
 
 ## 使用方法
 
@@ -26,7 +27,9 @@
 | /shootexp restore stock <玩家> <数量>      | shootexp.restore | 恢复玩家的经验存量   |
 | /shootexp set <玩家> <射出次数> <经验存量> | shootexp.set     | 设置玩家的状态       |
 | /shootexp reload                           | shootexp.reload  | 重载插件             |
-玩家默认拥有`shootexp.status`权限，op默认拥有所有权限。
+| /shootexp toggle <messages/attack>         | shootexp.toggle  | 切换消息接收/被攻击权限 |
+| /shootexp gui                              | shootexp.gui     | 打开设置GUI界面      |
+玩家默认拥有`shootexp.status`、`shootexp.toggle`、`shootexp.gui`权限，op默认拥有所有权限。
 
 ## 插件配置
 
@@ -144,3 +147,14 @@ sound:
   # 吃掉经验时的声音
   eat: 'minecraft:entity.generic.drink'
 ```
+
+### Folia 支持
+
+本分支专为 [Folia](https://github.com/PaperMC/Folia) 设计，使用 Folia 的区域化调度器（RegionScheduler/EntityScheduler）替代传统 Bukkit 调度器，确保在多线程环境下安全运行。插件已处理以下 Folia 兼容性问题：
+
+- 所有实体/方块/世界操作均在对应区域线程内执行
+- 使用 `ConcurrentHashMap` 保证线程安全的玩家状态管理
+- 初始延迟强制 ≥ 1 tick，符合 Folia 要求
+- 数据保存操作加锁，防止并发写入冲突
+
+Folia 版本与 Paper/Spigot 版本**不兼容**，请根据您的服务端类型选择正确的版本。
