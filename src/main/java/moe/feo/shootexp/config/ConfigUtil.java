@@ -23,15 +23,16 @@ public class ConfigUtil {
 	public static FileConfiguration load(String filename) {
 		JavaPlugin plugin = ShootEXP.getPlugin(ShootEXP.class);
 		File file = new File(plugin.getDataFolder(), filename);
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);// 用这个方法加载配置可以解决编码问题
-		InputStream input = plugin.getResource(filename);
-		if (input != null) {
-			try (Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {// 读取默认配置
-				YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(reader);
-				config.setDefaults(defConfig);// 设置默认
-			} catch (IOException ioe) {
-				plugin.getLogger().log(Level.SEVERE, "Error when reading default config!", ioe);
+		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+		try (InputStream input = plugin.getResource(filename)) {
+			if (input != null) {
+				try (Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
+					YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(reader);
+					config.setDefaults(defConfig);
+				}
 			}
+		} catch (IOException ioe) {
+			plugin.getLogger().log(Level.SEVERE, "Error when reading default config!", ioe);
 		}
 		return config;
 	}

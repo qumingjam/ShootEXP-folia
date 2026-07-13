@@ -2,11 +2,10 @@ name: ShootEXP
 main: moe.feo.shootexp.ShootEXP
 version: 1.2.2
 author: Fengshuai(R_Josef)
-api-version: 1.16
+api-version: '1.21'
 folia-supported: true
 softdepend:
   - SkillAPI
-  - MMOCore
   - Brewery
 commands:
   shootexp:

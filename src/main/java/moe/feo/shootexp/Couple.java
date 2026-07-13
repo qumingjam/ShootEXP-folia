@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Couple表示一对情侣
@@ -19,8 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Couple {
 
 	private final Player attacker;// 进攻方
-	private Entity defender;// 防守方
-	private int numOfAttack;// 攻击次数
+	private volatile Entity defender;// 防守方
+	private final AtomicInteger numOfAttack = new AtomicInteger(0);// 攻击次数
 	private final int period = 20;// 循环检查的间隔
 	private Object timerTask = null;// 定时任务对象
 	private final AtomicBoolean isRunning = new AtomicBoolean(true);// 任务运行标志
@@ -61,17 +62,18 @@ public class Couple {
 			 * 检查玩家是否超时
 			 */
 			public void checkTimes() {
-				if (numOfAttack > cacheNumOfAttack) {// 攻击次数增加
-					attackTimeoutCount = 0;// 超时计数置零
+				int current = numOfAttack.get();
+				if (current > cacheNumOfAttack) {
+					attackTimeoutCount = 0;
 				} else {
-					attackTimeoutCount++;// 超时计数增加
+					attackTimeoutCount++;
 				}
 				int timeoutCount = Config.ATTACK_TIMEOUT.getInt() / period;
 				if (attackTimeoutCount > timeoutCount) {// 超时
 					stopTimer();
 					CoupleManager.removeCouple(attacker.getUniqueId());// 从干活玩家名单中删除
 				}
-				cacheNumOfAttack = numOfAttack;
+				cacheNumOfAttack = numOfAttack.get();
 			}
 
 			/**
@@ -88,7 +90,7 @@ public class Couple {
 				if (!PlayerStatusManager.hasStatus(attacker.getUniqueId())) {// 如果不存在攻击者的状态数据
 					PlayerStatusManager.addStatus(attacker.getUniqueId(), new PlayerStatus());// 放一个数据进去
 				}
-				if (numOfAttack >= PlayerStatusManager.getStatus(attacker.getUniqueId()).getRequiredAttackTimes()) {// 当攻击次数大于所需次数
+				if (numOfAttack.get() >= PlayerStatusManager.getStatus(attacker.getUniqueId()).getRequiredAttackTimes()) {// 当攻击次数大于所需次数
 					int EXPAmount = PlayerStatusManager.getStatus(attacker.getUniqueId()).ejaculation();// 射一次
 					boolean isTranslate = false;
 					String msg;
@@ -101,11 +103,11 @@ public class Couple {
 							itemEntity.setVelocity(new org.bukkit.util.Vector(0, 0, 0));
 						});
 						msg = Language.MESSAGES_SHOOT.getString().replace("%ATTACKER%", attacker.getName())
-								.replace("%TIMES%", String.valueOf(numOfAttack)).replace("%AMOUNT%", String.valueOf(EXPAmount));
+								.replace("%TIMES%", String.valueOf(numOfAttack.get())).replace("%AMOUNT%", String.valueOf(EXPAmount));
 						sound = Config.SOUND_SHOOT.getString();
 					} else {
 						msg = Language.MESSAGES_SHOOT_NO_EXP.getString().replace("%ATTACKER%", attacker.getName())
-								.replace("%TIMES%", String.valueOf(numOfAttack));
+								.replace("%TIMES%", String.valueOf(numOfAttack.get()));
 						sound = Config.SOUND_SHOOT_NO_EXP.getString();
 					}
 					if (defender instanceof Player) {
@@ -133,7 +135,7 @@ public class Couple {
 							}
 						} else {
 							// 广播模式：使用全局调度器
-							FoliaScheduler.runGlobal(ShootEXP.getPlugin(ShootEXP.class), () -> Bukkit.spigot().broadcast(component));
+							FoliaScheduler.runGlobal(ShootEXP.getPlugin(ShootEXP.class), () -> Bukkit.getServer().broadcast(component));
 						}
 					} else {
 						if (Config.PRIVATE_MESSAGE.getBoolean()) {
@@ -202,6 +204,6 @@ public class Couple {
 	 * 攻击一次
 	 */
 	public void attack() {
-		numOfAttack++;// 攻击次数增加
+		numOfAttack.incrementAndGet();
 	}
 }

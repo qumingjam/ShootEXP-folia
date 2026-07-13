@@ -33,15 +33,12 @@ public class EatListener implements Listener {
 			if (((getServer().getPluginManager().getPlugin("Brewery") != null && getServer().getPluginManager().getPlugin("Brewery").isEnabled())
 					|| (getServer().getPluginManager().getPlugin("BreweryX") != null && getServer().getPluginManager().getPlugin("BreweryX").isEnabled()))
 					&& action == Action.RIGHT_CLICK_BLOCK) {
-				System.out.println("Material: " + e.getClickedBlock().getType().name());
-				if (BreweryApi.getBarrel(e.getClickedBlock()) != null || BreweryApi.getCauldron(e.getClickedBlock()) != null) {
+				org.bukkit.block.Block clicked = e.getClickedBlock();
+				if (clicked == null) return;
+				if (BreweryApi.getBarrel(clicked) != null || BreweryApi.getCauldron(clicked) != null) {
 					return;
-				} else if (e.getClickedBlock().getType() == Material.getMaterial("WATER_CAULDRON")) {
-					int x = e.getClickedBlock().getLocation().getBlockX();
-					int y = e.getClickedBlock().getLocation().getBlockY();
-					int z = e.getClickedBlock().getLocation().getBlockZ();
-					World world = e.getClickedBlock().getLocation().getWorld();
-					Location down = new Location(world, x, y-1, z);
+				} else if (clicked.getType() == Material.WATER_CAULDRON) {
+					Location down = clicked.getLocation().subtract(0, 1, 0);
 					if (down.getBlock().getType() == Material.FIRE) {
 						return;
 					}
@@ -64,8 +61,15 @@ public class EatListener implements Listener {
 					player.giveExp(exp.getAmount());
 			}
 			player.getWorld().playSound(player.getLocation(), Config.SOUND_EAT.getString(), SoundCategory.PLAYERS, 1, 1);
-			String msg = Language.MESSAGES_EAT.getString().replace("%PLAYER%", player.getName()).replace("%OWNER%", exp.getOwner())
-					.replace("%RECIPIENT%", exp.getRecipient()).replace("%AMOUNT%", String.valueOf(exp.getAmount()));
+			String msg = Language.MESSAGES_EAT.getString();
+			java.util.Map<String, String> replacements = new java.util.HashMap<>();
+			replacements.put("%PLAYER%", player.getName());
+			replacements.put("%OWNER%", exp.getOwner());
+			replacements.put("%RECIPIENT%", exp.getRecipient());
+			replacements.put("%AMOUNT%", String.valueOf(exp.getAmount()));
+			for (java.util.Map.Entry<String, String> entry : replacements.entrySet()) {
+				msg = msg.replace(entry.getKey(), entry.getValue());
+			}
 			if (Config.PRIVATE_MESSAGE.getBoolean()) {
 				player.sendMessage(msg);
 				Player owner = Bukkit.getPlayer(exp.getOwner());
