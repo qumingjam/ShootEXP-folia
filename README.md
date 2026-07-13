@@ -158,3 +158,15 @@ sound:
 - 数据保存操作加锁，防止并发写入冲突
 
 Folia 版本与 Paper/Spigot 版本**不兼容**，请根据您的服务端类型选择正确的版本。
+
+---
+
+## 优化记录
+
+- Java 版本：`8` → `21`，`spigot-api 1.16.4` → `paper-api 1.21.4`
+- `plugin.yml`：`api-version: 1.16` → `'1.21'`，移除未使用的 `MMOCore` softdepend
+- `FoliaScheduler.java`：268 行反射实现重写为 80 行编译期安全实现，移除全部 `Method.invoke()`、`Bukkit.getScheduler()`、`BukkitRunnable`
+- `Couple.java`：`int numOfAttack` → `AtomicInteger`，`Entity defender` → `volatile`，修复跨线程数据竞争
+- `EatListener.java`：增加 `getClickedBlock() == null` 守卫，移除 `System.out.println`
+- `ConfigUtil.java`：`InputStream` 移入 `try-with-resources` 块内，修复资源泄漏
+- `ShootEXP.java`：`onDisable()` 新增 `cancelTasks()` 和 `HandlerList.unregisterAll()`
