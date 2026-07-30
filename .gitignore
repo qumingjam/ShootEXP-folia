@@ -1,0 +1,11 @@
+#IDEA files
+.idea/
+ShootEXP.iml
+
+# Target folder
+target/
+
+dependency-reduced-pom.xml
+
+# Player data (should not be committed)
+playerdata.yml
