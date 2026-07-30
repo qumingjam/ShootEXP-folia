@@ -1,7 +1,14 @@
-# ShootEXP
+# ShootEXP — 经验射击
 
-Player interaction based experience shooting system. Players can shoot experience items to each other.
+玩家通过蹲起交互射出经验物品，其他玩家拾取获得经验值。
 
-## Tech Stack
+## 功能
 
-- Java 21, Paper API 1.21+, Folia compatible
+- 玩家间经验交互
+- 耦合/解耦系统
+- 可配置射击参数
+- Folia 兼容
+
+## 技术栈
+
+- Java 21, Paper API 1.21+, Folia 兼容
