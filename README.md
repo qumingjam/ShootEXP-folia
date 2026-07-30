@@ -1,6 +1,6 @@
 # ShootEXP — 经验射击
 
-Version: 1.3.1
+Version: **1.3.1**
 
 玩家通过蹲起交互射出经验物品，其他玩家拾取获得经验值。
 
@@ -10,6 +10,10 @@ Version: 1.3.1
 - 耦合/解耦系统
 - 可配置射击参数
 - Folia 兼容调度
+
+## 下载
+
+[ShootEXP-1.3.1.jar](https://github.com/qumingjam/ShootEXP-folia/releases/download/v1.3.1/ShootEXP-1.3.1.jar)
 
 ## 技术栈
 
