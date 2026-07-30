@@ -1,20 +1,54 @@
 # ShootEXP — 经验射击
 
-Version: **1.3.1**
+**最新版本：v1.3.1** | [下载 Release](https://github.com/qumingjam/ShootEXP-folia/releases/tag/v1.3.1)
+
+Player interaction based experience shooting system.
 
 玩家通过蹲起交互射出经验物品，其他玩家拾取获得经验值。
 
-## 功能
+> ⚡ Folia 兼容调度。
 
-- 玩家间经验交互
-- 耦合/解耦系统
-- 可配置射击参数
-- Folia 兼容调度
+---
 
-## 下载
+## Features | 功能
 
-[ShootEXP-1.3.1.jar](https://github.com/qumingjam/ShootEXP-folia/releases/download/v1.3.1/ShootEXP-1.3.1.jar)
+| 功能 | 说明 |
+|------|------|
+| 🎯 **经验射击** | 蹲起交互射出经验物品 |
+| 🔗 **耦合系统** | 玩家配对经验交互 |
+| ⚙️ **可配置** | 射击参数完全自定义 |
+| 🧵 **Folia** | 完全兼容区域线程调度 |
 
-## 技术栈
+---
 
-Java 21, Paper API 1.21+, Folia 兼容
+## Commands | 命令
+
+| 命令 | 说明 |
+|------|------|
+| `/shootexp` | 查看帮助 |
+| `/shootexp reload` | 重载配置 |
+
+---
+
+## Build | 构建
+
+```bash
+git clone https://github.com/qumingjam/ShootEXP-folia.git
+cd ShootEXP-folia
+mvn clean package
+```
+
+产出：`target/ShootEXP-1.3.1.jar`
+
+---
+
+## Dependencies | 依赖
+
+- **Paper API 1.21+**（provided）
+
+---
+
+## Links | 链接
+
+- 仓库：[github.com/qumingjam/ShootEXP-folia](https://github.com/qumingjam/ShootEXP-folia)
+- 作者：Qumingjam
