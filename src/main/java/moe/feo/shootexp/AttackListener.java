@@ -28,7 +28,11 @@ public class AttackListener implements Listener {
                 UUID defenderUuid = ((Player) partner).getUniqueId();
                 if (PlayerStatusManager.hasStatus(defenderUuid)) {
                     PlayerStatus defenderStatus = PlayerStatusManager.getStatus(defenderUuid);
+                    // 先检查保护是否已到期，到期自动恢复禁止
+                    defenderStatus.checkAndRestoreProtection();
                     if (!defenderStatus.canBeAttacked()) {
+                        // 被尝试选中（即使攻击被阻止也计数），达到阈值自动解除禁止
+                        defenderStatus.onAttemptedAttack();
                         return; // 防守者不允许被攻击，直接返回
                     }
                 }

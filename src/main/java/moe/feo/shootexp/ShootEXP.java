@@ -27,6 +27,16 @@ public class ShootEXP extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SettingsGUI(), this);
         this.getCommand("shootexp").setExecutor(Commands.getInstance());
         this.getCommand("shootexp").setTabCompleter(Commands.getInstance());
+
+        // 被攻击保护自动恢复检查（每5秒检查在线玩家保护是否到期并恢复禁止）
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, (task) -> {
+            for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
+                java.util.UUID uid = player.getUniqueId();
+                if (PlayerStatusManager.hasStatus(uid)) {
+                    PlayerStatusManager.getStatus(uid).checkAndRestoreProtection();
+                }
+            }
+        }, 100L, 100L);
     }
 
     @Override

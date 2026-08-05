@@ -79,14 +79,36 @@ public class SettingsGUI implements Listener {
         boolean canBeAttacked = status.canBeAttacked();
         Material attackMaterial = canBeAttacked ? Material.LIME_DYE : Material.RED_DYE;
         String attackStatus = canBeAttacked ? "§a允许" : "§c禁止";
-        ItemStack attackToggle = createItem(attackMaterial, "§e§l被攻击权限",
-            "§7当前状态: " + attackStatus,
-            "",
-            "§7点击切换是否允许",
-            "§7其他玩家对你使用",
-            "§7ShootEXP 功能",
-            "",
-            canBeAttacked ? "§a✓ 已允许" : "§c✗ 已禁止");
+        ItemStack attackToggle;
+        if (canBeAttacked) {
+            attackToggle = createItem(attackMaterial, "§e§l被攻击权限",
+                "§7当前状态: " + attackStatus,
+                "",
+                "§7点击切换是否允许",
+                "§7其他玩家对你使用",
+                "§7ShootEXP 功能",
+                "",
+                "§a✓ 已允许");
+        } else if (status.isProtectionBroken()) {
+            attackToggle = createItem(attackMaterial, "§e§l被攻击权限",
+                "§7当前状态: " + attackStatus,
+                "",
+                "§7点击切换是否允许",
+                "§7其他玩家对你使用",
+                "§7ShootEXP 功能",
+                "",
+                "§c⚠ 保护已失效，即将自动恢复");
+        } else {
+            attackToggle = createItem(attackMaterial, "§e§l被攻击权限",
+                "§7当前状态: " + attackStatus,
+                "",
+                "§7点击切换是否允许",
+                "§7其他玩家对你使用",
+                "§7ShootEXP 功能",
+                "",
+                "§c✗ 已禁止",
+                "§7被尝试选中: §f" + status.getAttackedCount() + "§7/20");
+        }
         inventory.setItem(15, attackToggle);
 
         // 装饰物品 - 玻璃板填充空位

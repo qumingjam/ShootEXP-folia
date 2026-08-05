@@ -20,6 +20,14 @@ public class PlayerStatus {
     private final AtomicBoolean isStockTaskRunning = new AtomicBoolean(false);// 恢复经验存量任务运行标志
     private volatile boolean receiveMessages = true;// 是否接收 ShootEXP 消息
     private volatile boolean canBeAttacked = true;// 是否可以被 ShootEXP 攻击
+    /** 被尝试选中计数（即使禁止被攻击也累计），达到阈值后保护临时失效 */
+    private volatile int attackedCount = 0;
+    /** 保护失效到期时间戳（0 = 未失效） */
+    private volatile long protectionBrokenUntil = 0;
+    /** 被尝试选中多少次要失效 */
+    private static final int ATTACK_THRESHOLD = 20;
+    /** 失效后多久自动恢复（毫秒） */
+    private static final long PROTECTION_BREAK_MS = 60_000L;
 
     /**
      * 获取一个新的恢复发射经验次数的Runnable
@@ -227,6 +235,9 @@ public class PlayerStatus {
      */
     public void setCanBeAttacked(boolean canBeAttacked) {
         this.canBeAttacked = canBeAttacked;
+        // 手动切换时重置保护失效状态和计数
+        this.attackedCount = 0;
+        this.protectionBrokenUntil = 0;
     }
 
     /**
@@ -235,5 +246,35 @@ public class PlayerStatus {
      */
     public boolean canBeAttacked() {
         return canBeAttacked;
+    }
+
+    /**
+     * 被尝试选中（即使禁止被攻击、攻击被阻止也计数）。
+     * 达到阈值后保护临时失效，变为可被攻击。
+     */
+    public void onAttemptedAttack() {
+        if (canBeAttacked) return;
+        attackedCount++;
+        if (attackedCount >= ATTACK_THRESHOLD) {
+            canBeAttacked = true;
+            protectionBrokenUntil = System.currentTimeMillis() + PROTECTION_BREAK_MS;
+        }
+    }
+
+    /** 检查保护是否到期，到期自动恢复禁止并重置计数 */
+    public void checkAndRestoreProtection() {
+        if (protectionBrokenUntil > 0 && System.currentTimeMillis() >= protectionBrokenUntil) {
+            canBeAttacked = false;
+            attackedCount = 0;
+            protectionBrokenUntil = 0;
+        }
+    }
+
+    public int getAttackedCount() {
+        return attackedCount;
+    }
+
+    public boolean isProtectionBroken() {
+        return protectionBrokenUntil > 0;
     }
 }

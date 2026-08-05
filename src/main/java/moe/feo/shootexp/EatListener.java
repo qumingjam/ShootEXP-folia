@@ -66,29 +66,49 @@ public class EatListener implements Listener {
             }
             player.getWorld().playSound(player.getLocation(), Config.SOUND_EAT.getString(), SoundCategory.PLAYERS, 1, 1);
             String msg = Language.MESSAGES_EAT.getString();
-            java.util.Map<String, String> replacements = new java.util.HashMap<>();
-            replacements.put("%PLAYER%", player.getName());
-            replacements.put("%OWNER%", exp.getOwner());
-            replacements.put("%RECIPIENT%", exp.getRecipient());
-            replacements.put("%AMOUNT%", String.valueOf(exp.getAmount()));
-            for (java.util.Map.Entry<String, String> entry : replacements.entrySet()) {
-                msg = msg.replace(entry.getKey(), entry.getValue());
+            msg = msg.replace("%PLAYER%", player.getName())
+                    .replace("%OWNER%", exp.getOwner())
+                    .replace("%AMOUNT%", String.valueOf(exp.getAmount()));
+            String recipientVal = exp.getRecipient();
+            Component message;
+            if (recipientVal != null && recipientVal.startsWith("entity.minecraft.")) {
+                message = buildWithEntity(msg, recipientVal);
+            } else {
+                message = parseLegacy(msg.replace("%RECIPIENT%", recipientVal == null ? "" : recipientVal));
             }
             if (Config.PRIVATE_MESSAGE.getBoolean()) {
-                player.sendMessage(msg);
+                player.sendMessage(message);
                 Player owner = Bukkit.getPlayer(exp.getOwner());
                 Player recipient = Bukkit.getPlayer(exp.getRecipient());
                 if (owner != null && owner.isOnline()) {
-                    owner.sendMessage(msg);
+                    owner.sendMessage(message);
                 }
                 if (recipient != null && recipient.isOnline()) {
-                    recipient.sendMessage(msg);
+                    recipient.sendMessage(message);
                 }
             } else {
-                getServer().broadcast(Component.text(msg));
+                getServer().broadcast(message);
             }
             item.setAmount(0);
             e.setCancelled(true);
         }
+    }
+
+    /** 消息组件化：%RECIPIENT% 是可翻译实体 key 时用 translatable（客户端显示中文） */
+    private static Component buildWithEntity(String msg, String key) {
+        String[] parts = msg.split("%RECIPIENT%");
+        Component comp = Component.empty();
+        for (int i = 0; i < parts.length; i++) {
+            comp = comp.append(parseLegacy(parts[i]));
+            if (i < parts.length - 1) {
+                comp = comp.append(Component.translatable(key));
+            }
+        }
+        return comp;
+    }
+
+    private static Component parseLegacy(String text) {
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                .legacyAmpersand().deserialize(text == null ? "" : text);
     }
 }

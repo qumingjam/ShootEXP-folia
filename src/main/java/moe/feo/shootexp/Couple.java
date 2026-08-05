@@ -98,7 +98,16 @@ public class Couple {
                     String msg;
                     String sound;
                     if (EXPAmount != 0) {
-                        ItemStack EXPItem = new EXP(attacker.getName(), defender.getName(), EXPAmount).getEXPItem();
+                        // 施法对象显示名：玩家→玩家名；命名牌→自定义名；无命名牌→可翻译实体 key（客户端显示中文）
+                        String recipientDisplay;
+                        if (defender instanceof Player) {
+                            recipientDisplay = defender.getName();
+                        } else {
+                            recipientDisplay = defender.getCustomName() != null
+                                ? defender.getCustomName()
+                                : "entity.minecraft." + defender.getType().name().toLowerCase();
+                        }
+                        ItemStack EXPItem = new EXP(attacker.getName(), recipientDisplay, EXPAmount).getEXPItem();
                         // 防守者线程掉物
                         final Entity capturedDefender = defender;
                         FoliaScheduler.runAtEntity(capturedDefender, () -> {

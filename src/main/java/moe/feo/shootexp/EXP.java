@@ -2,6 +2,7 @@ package moe.feo.shootexp;
 
 import moe.feo.shootexp.config.Config;
 import moe.feo.shootexp.config.Language;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -94,15 +95,14 @@ public class EXP {
         ItemStack item = new ItemStack(Material.BONE_MEAL);
         ItemMeta meta = Bukkit.getItemFactory().getItemMeta(Material.BONE_MEAL);
         String itemName = Language.ITEM_NAME.getString().replace("%OWNER%", owner)
-                .replace("%RECIPIENT%", recipient).replace("%AMOUNT%", Integer.toString(amount));
-        List<String > loreList = new ArrayList<>();
+                .replace("%AMOUNT%", Integer.toString(amount));
+        List<Component> loreList = new ArrayList<>();
         for (String lore : Language.ITEM_LORE.getStringList()) {
-            loreList.add(lore.replace("%OWNER%", owner).replace("%RECIPIENT%", recipient).
-                    replace("%AMOUNT%", Integer.toString(amount)));
+            loreList.add(buildLoreComponent(lore));
         }
         assert meta != null;
-        meta.setDisplayName(itemName);
-        meta.setLore(loreList);
+        meta.displayName(parseLegacy(itemName));
+        meta.lore(loreList);
         if (Config.CUSTOM_MODEL_DATA_ENABLE.getBoolean()) {
             meta.setCustomModelData(Config.CUSTOM_MODEL_DATA_VALUE.getInt());
         }
@@ -112,6 +112,31 @@ public class EXP {
         container.set(amountKey, PersistentDataType.INTEGER, amount);
         item.setItemMeta(meta);
         return item;
+    }
+
+    /** Lore 组件化：%RECIPIENT% 若是可翻译实体 key 用 translatable（客户端显示中文），否则文本；& 颜色解析 */
+    private Component buildLoreComponent(String lore) {
+        String base = lore.replace("%OWNER%", owner).replace("%AMOUNT%", Integer.toString(amount));
+        String[] parts = base.split("%RECIPIENT%");
+        Component comp = Component.empty();
+        for (int i = 0; i < parts.length; i++) {
+            comp = comp.append(parseLegacy(parts[i]));
+            if (i < parts.length - 1) {
+                comp = comp.append(isTranslatable(recipient)
+                        ? Component.translatable(recipient)
+                        : parseLegacy(recipient));
+            }
+        }
+        return comp;
+    }
+
+    private boolean isTranslatable(String value) {
+        return value != null && value.startsWith("entity.minecraft.");
+    }
+
+    private static Component parseLegacy(String text) {
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
+                .legacyAmpersand().deserialize(text == null ? "" : text);
     }
 
     /**
