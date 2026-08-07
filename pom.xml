@@ -13,7 +13,7 @@
 
     <groupId>moe.feo.shootexp</groupId>
     <artifactId>ShootEXP</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
 
     <name>ShootEXP</name>
     <description>Folia-compatible player interaction experience shooter</description>
