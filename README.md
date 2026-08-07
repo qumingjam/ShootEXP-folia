@@ -1,6 +1,6 @@
 # ShootEXP — 经验射击
 
-**最新版本：v1.3.1** | [下载 Release](https://github.com/qumingjam/ShootEXP-folia/releases/tag/v1.3.1)
+**最新版本：v1.3.2** | [下载 Release](https://github.com/qumingjam/ShootEXP-folia/releases/tag/v1.3.2)
 
 Player interaction based experience shooting system.
 
