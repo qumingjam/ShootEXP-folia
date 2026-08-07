@@ -43,6 +43,15 @@ public class PlayerStatusManager {
     }
 
     /**
+     * 移除一个玩家状态（玩家退出时调用，防止离线条目永久驻留）
+     * @param uuid
+     * 玩家的UUID
+     */
+    public static void remove(UUID uuid) {
+        statusMap.remove(uuid);
+    }
+
+    /**
      * 获取所有玩家状态
      * @return 所有玩家状态的 Map
      */

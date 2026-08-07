@@ -70,7 +70,7 @@ public class Couple {
                 } else {
                     attackTimeoutCount++;
                 }
-                int timeoutCount = Config.ATTACK_TIMEOUT.getInt() / period;
+                int timeoutCount = Math.max(1, Config.ATTACK_TIMEOUT.getInt() / period);
                 if (attackTimeoutCount > timeoutCount) {// 超时
                     stopTimer();
                     CoupleManager.removeCouple(attacker.getUniqueId());// 从干活玩家名单中删除
@@ -82,8 +82,14 @@ public class Couple {
              * 检查攻击次数
              */
             public void checkNum() {
+                // Folia R6：防守者可能已移动到其他区域；仅在本区域线程内读取其状态
+                if (defender == null || !Bukkit.isOwnedByCurrentRegion(defender)) {
+                    stopTimer();
+                    CoupleManager.removeCouple(attacker.getUniqueId());
+                    return;
+                }
                 // 检查防守者是否有效
-                if (defender == null || !defender.isValid()) {
+                if (!defender.isValid()) {
                     stopTimer();
                     CoupleManager.removeCouple(attacker.getUniqueId());
                     return;

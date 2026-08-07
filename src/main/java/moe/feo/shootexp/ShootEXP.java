@@ -28,6 +28,20 @@ public class ShootEXP extends JavaPlugin {
         this.getCommand("shootexp").setExecutor(Commands.getInstance());
         this.getCommand("shootexp").setTabCompleter(Commands.getInstance());
 
+        // 玩家退出清理：移除状态条目 + 停止活跃 Couple（防止离线条目/Couple 泄漏）
+        getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
+            @org.bukkit.event.EventHandler
+            public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
+                java.util.UUID uid = event.getPlayer().getUniqueId();
+                PlayerStatusManager.remove(uid);
+                if (CoupleManager.hasCouple(uid)) {
+                    Couple couple = CoupleManager.getCouple(uid);
+                    if (couple != null) couple.stop();
+                    CoupleManager.removeCouple(uid);
+                }
+            }
+        }, this);
+
         // 被攻击保护自动恢复检查（每5秒检查在线玩家保护是否到期并恢复禁止）
         Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, (task) -> {
             for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
